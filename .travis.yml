@@ -29,5 +29,5 @@ install:
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
   - $CXX --version
   - npm/.bin/npm install
-  - node_modules/.bin/node-gyp rebuild --directory test
-script: node_modules/.bin/mocha test/*_test.js
+  - node_modules/.bin/node-gyp rebuild
+script: node_modules/.bin/mocha tests/*_test.js
