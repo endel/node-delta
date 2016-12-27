@@ -1,0 +1,29 @@
+{
+  "name": "node-delta",
+  "version": "1.0.0",
+  "description": "An efficient delta compression algorithm for Node.js",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "benchmark": "node tests/benchmark.js",
+    "test": "mocha tests/*_test.js && tsc tests/typescript/tests.ts"
+  },
+  "author": "Endel Dreyer",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^6.0.54",
+    "benchmark": "^2.1.3",
+    "chai": "^3.5.0",
+    "fossil-delta": "^0.2.5",
+    "mocha": "^3.2.0",
+    "msgpack-lite": "^0.1.26",
+    "node-gyp": "^3.4.0",
+    "tape": "^4.6.3",
+    "typescript": "^2.1.4"
+  },
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "nan": "^2.5.0"
+  },
+  "gypfile": true
+}
