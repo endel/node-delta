@@ -28,153 +28,6 @@
 #include <string.h>
 
 /*
-** A Blob can hold a string or a binary object of arbitrary size.  The
-** size changes as necessary.
-*/
-struct Blob {
-  unsigned int nUsed;            /* Number of bytes used in aData[] */
-  unsigned int nAlloc;           /* Number of bytes allocated for aData[] */
-  unsigned int iCursor;          /* Next character of input to parse */
-  unsigned int blobFlags;        /* One or more BLOBFLAG_* bits */
-  char *aData;                   /* Where the information is stored */
-  void (*xRealloc)(Blob*, unsigned int); /* Function to reallocate the buffer */
-};
-
-/*
-** Allowed values for Blob.blobFlags
-*/
-#define BLOBFLAG_NotSQL  0x0001      /* Non-SQL text */
-
-/*
-** The current size of a Blob
-*/
-#define blob_size(X)  ((X)->nUsed)
-
-/*
-** The buffer holding the blob data
-*/
-#define blob_buffer(X)  ((X)->aData)
-
-
-/*
-** Seek whence parameter values
-*/
-#define BLOB_SEEK_SET 1
-#define BLOB_SEEK_CUR 2
-#define BLOB_SEEK_END 3
-
-/*
-** A reallocation function that assumes that aData came from malloc().
-** This function attempts to resize the buffer of the blob to hold
-** newSize bytes.
-**
-** No attempt is made to recover from an out-of-memory error.
-** If an OOM error occurs, an error message is printed on stderr
-** and the program exits.
-*/
-void blobReallocMalloc(Blob *pBlob, unsigned int newSize){
-  if( newSize==0 ){
-    free(pBlob->aData);
-    pBlob->aData = 0;
-    pBlob->nAlloc = 0;
-    pBlob->nUsed = 0;
-    pBlob->iCursor = 0;
-    pBlob->blobFlags = 0;
-  }else if( newSize>pBlob->nAlloc || newSize<pBlob->nAlloc-4000 ){
-    char *pNew = (char *) realloc(pBlob->aData, newSize);
-    pBlob->aData = pNew;
-    pBlob->nAlloc = newSize;
-    if( pBlob->nUsed>pBlob->nAlloc ){
-      pBlob->nUsed = pBlob->nAlloc;
-    }
-  }
-}
-
-/*
-** An initializer for Blobs
-*/
-#define BLOB_INITIALIZER  {0,0,0,0,0,blobReallocMalloc}
-const Blob empty_blob = BLOB_INITIALIZER;
-
-/*
-** A reallocation function for when the initial string is in unmanaged
-** space.  Copy the string to memory obtained from malloc().
-*/
-static void blobReallocStatic(Blob *pBlob, unsigned int newSize){
-  if( newSize==0 ){
-    *pBlob = empty_blob;
-  }else{
-    char *pNew = (char *) malloc( newSize );
-    if( pBlob->nUsed>newSize ) pBlob->nUsed = newSize;
-    memcpy(pNew, pBlob->aData, pBlob->nUsed);
-    pBlob->aData = pNew;
-    pBlob->xRealloc = blobReallocMalloc;
-    pBlob->nAlloc = newSize;
-  }
-}
-
-/*
-** Attempt to resize a blob so that its internal buffer is
-** nByte in size.  The blob is truncated if necessary.
-*/
-void blob_resize(Blob *pBlob, unsigned int newSize){
-  pBlob->xRealloc(pBlob, newSize+1);
-  pBlob->nUsed = newSize;
-  pBlob->aData[newSize] = 0;
-}
-
-/*
-** Make sure a blob is nul-terminated and is not a pointer to unmanaged
-** space.  Return a pointer to the data.
-*/
-char *blob_materialize(Blob *pBlob){
-  blob_resize(pBlob, pBlob->nUsed);
-  return pBlob->aData;
-}
-
-/*
-** Make sure a blob does not contain malloced memory.
-**
-** This might fail if we are unlucky and x is uninitialized.  For that
-** reason it should only be used locally for debugging.  Leave it turned
-** off for production.
-*/
-#if 0  /* Enable for debugging only */
-#define assert_blob_is_reset(x) assert(blob_is_reset(x))
-#else
-#define assert_blob_is_reset(x)
-#endif
-
-/*
-** Initialize a blob to an empty string.
-*/
-void blob_zero(Blob *pBlob){
-  static const char zEmpty[] = "";
-  assert_blob_is_reset(pBlob);
-  pBlob->nUsed = 0;
-  pBlob->nAlloc = 1;
-  pBlob->aData = (char*)zEmpty;
-  pBlob->iCursor = 0;
-  pBlob->blobFlags = 0;
-  pBlob->xRealloc = blobReallocStatic;
-}
-
-/*
-** Make sure a blob is initialized
-*/
-#define blob_is_init(x) \
-  assert((x)->xRealloc==blobReallocMalloc || (x)->xRealloc==blobReallocStatic)
-
-/*
-** Reset a blob to be an empty container.
-*/
-void blob_reset(Blob *pBlob){
-  blob_is_init(pBlob);
-  pBlob->xRealloc(pBlob, 0);
-}
-
-
-/*
 ** Macros for turning debugging printfs on and off
 */
 #if 0
@@ -667,28 +520,6 @@ int delta_create(
 }
 
 /*
-** Create a delta that describes the change from pOriginal to pTarget
-** and put that delta in pDelta.  The pDelta blob is assumed to be
-** uninitialized.
-*/
-int blob_delta_create(Blob *pOriginal, Blob *pTarget, Blob *pDelta){
-  const char *zOrig, *zTarg;
-  int lenOrig, lenTarg;
-  int len;
-  char *zRes;
-  blob_zero(pDelta);
-  zOrig = blob_materialize(pOriginal);
-  lenOrig = blob_size(pOriginal);
-  zTarg = blob_materialize(pTarget);
-  lenTarg = blob_size(pTarget);
-  blob_resize(pDelta, lenTarg+16);
-  zRes = blob_materialize(pDelta);
-  len = delta_create(zOrig, lenOrig, zTarg, lenTarg, zRes);
-  blob_resize(pDelta, len);
-  return 0;
-}
-
-/*
 ** Return the size (in bytes) of the output from applying
 ** a delta.
 **
@@ -888,14 +719,9 @@ void Create(const Nan::FunctionCallbackInfo<Value>& args) {
   const char* zTarg = node::Buffer::Data(args[1]);
   size_t lenTarg = node::Buffer::Length(args[1]);
 
-  Blob pDelta;
-  blob_zero(&pDelta);
-  blob_resize(&pDelta, lenTarg+16);
-  char *zRes = blob_materialize(&pDelta);
-
-  int deltaLength = delta_create(zOrig, lenOrig, zTarg, lenTarg, zRes);
-
-  args.GetReturnValue().Set(Nan::NewBuffer(zRes, deltaLength).ToLocalChecked());
+  char *pDelta = (char *) malloc( lenTarg+16 );
+  int deltaLength = delta_create(zOrig, lenOrig, zTarg, lenTarg, pDelta);
+  args.GetReturnValue().Set(Nan::NewBuffer(pDelta, deltaLength).ToLocalChecked());
 }
 
 void Apply(const Nan::FunctionCallbackInfo<Value>& args) {
@@ -905,20 +731,9 @@ void Apply(const Nan::FunctionCallbackInfo<Value>& args) {
   const char* zDelta = node::Buffer::Data(args[1]);
   size_t lenDelta = node::Buffer::Length(args[1]);
 
-  Blob out;
-  blob_zero(&out);
-
-  int n = delta_output_size(zDelta, lenDelta);
-  blob_zero(&out);
-
-  if( n < 0 ) {
-    args.GetReturnValue().Set(Nan::False());
-
-  } else {
-    blob_resize(&out, n);
-    int appliedLength = delta_apply(zOrig, lenOrig, zDelta, lenDelta, blob_buffer(&out));
-    args.GetReturnValue().Set(Nan::NewBuffer(blob_buffer(&out), appliedLength).ToLocalChecked());
-  }
+  char *out = (char *) malloc( delta_output_size(zDelta, lenDelta) );
+  int appliedLength = delta_apply(zOrig, lenOrig, zDelta, lenDelta, out);
+  args.GetReturnValue().Set(Nan::NewBuffer(out, appliedLength).ToLocalChecked());
 }
 
 void Init(Local<Object> exports) {
