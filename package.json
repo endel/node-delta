@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "scripts": {
     "benchmark": "node tests/benchmark.js",
-    "test": "mocha tests/*_test.js && tsc tests/typescript/tests.ts"
+    "test": "mocha tests/*_test.js && tsc tests/typescript/tests.ts --noEmit"
   },
   "author": "Endel Dreyer",
   "license": "ISC",

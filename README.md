@@ -1,7 +1,31 @@
-node-delta
+node-delta [![Build Status](https://secure.travis-ci.org/endel/node-delta.png?branch=master)](http://travis-ci.org/endel/node-delta)
 ===
 
 An efficient delta compression algorithm for Node.js. (C++ addon)
+
+**Requires Node.js 0.10+**
+
+Usage
+---
+
+```
+const nDelta = require('node-delta');
+```
+
+Creating delta between `origin` and `target` buffer:
+
+```
+var origin = new Buffer([1,2,3,4]);
+var target = new Buffer([1,2,3,4,5,6]);
+var delta = nDelta.create(origin, target);
+```
+
+Applying the delta:
+
+```
+var origin = new Buffer([1,2,3,4]);
+var target = nDelta.apply(origin, delta);
+```
 
 Benchmarks
 ---
