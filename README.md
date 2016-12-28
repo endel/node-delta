@@ -31,8 +31,8 @@ Benchmarks
 ---
 
 ```
-node-delta x 228,969 ops/sec ±3.87% (65 runs sampled)
-fossil-delta x 178,216 ops/sec ±3.80% (76 runs sampled)
+(create) node-delta x 266,036 ops/sec ±3.01% (69 runs sampled)
+(create) fossil-delta x 199,668 ops/sec ±1.95% (82 runs sampled)
 ```
 
 References

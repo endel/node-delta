@@ -29,11 +29,11 @@ var packed2 = msgpack.encode(obj2);
 
 let suite = new Benchmark.Suite()
 
-suite.add('node-delta', function() {
+suite.add('(create) node-delta', function() {
   nodeDelta.create(packed1, packed2);
 });
 
-suite.add('fossil-delta', function() {
+suite.add('(create) fossil-delta', function() {
   fossilDelta.create(packed1, packed2);
 });
 
