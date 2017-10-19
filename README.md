@@ -3,7 +3,7 @@ node-delta [![Build Status](https://secure.travis-ci.org/endel/node-delta.svg?br
 
 An efficient delta compression algorithm for Node.js. (C++ addon)
 
-**Requires Node.js 0.10+**
+**Requires NodeJS v4 or higher**
 
 Usage
 ---
