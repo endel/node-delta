@@ -1,6 +1,6 @@
 {
   "name": "node-delta",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An efficient delta compression algorithm for Node.js",
   "main": "index.js",
   "types": "index.d.ts",
@@ -10,8 +10,8 @@
   },
   "author": "Endel Dreyer",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/endel/node-delta.git"
+    "type": "git",
+    "url": "https://github.com/endel/node-delta.git"
   },
   "license": "MIT",
   "devDependencies": {

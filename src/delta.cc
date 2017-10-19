@@ -1,5 +1,6 @@
 /*
 ** Copyright (c) 2006 D. Richard Hipp
+** Copyright (c) 2016 Endel Dreyer
 **
 ** This program is free software; you can redistribute it and/or
 ** modify it under the terms of the Simplified BSD License (also
@@ -200,7 +201,7 @@ static unsigned int getInt(const char **pz, int *pLen){
 /*
 ** Return the number digits in the base-64 representation of a positive integer
 */
-static int digit_count(int v){
+static int digit_count(unsigned int v){
   unsigned int i, x;
   for(i=1, x=64; v>=x; i++, x <<= 6){}
   return i;
@@ -342,7 +343,7 @@ int delta_create(
   unsigned int lenOut,   /* Length of the target file */
   char *zDelta           /* Write the delta into this buffer */
 ){
-  int i, base;
+  unsigned int i, base;
   char *zOrigDelta = zDelta;
   hash h;
   int nHash;                 /* Number of hash table entries */

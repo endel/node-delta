@@ -1,7 +1,7 @@
 node-delta [![Build Status](https://secure.travis-ci.org/endel/node-delta.svg?branch=master)](http://travis-ci.org/endel/node-delta) [![Build status](https://ci.appveyor.com/api/projects/status/m3shq2gxu1a1hk91?svg=true)](https://ci.appveyor.com/project/endel/node-delta)
 ===
 
-An efficient delta compression algorithm for Node.js. (C++ addon)
+An efficient delta compression algorithm for Node.js, written in C. ([see original source code](http://fossil-scm.org/xfer/artifact/e5c5c088b05441b7))
 
 **Requires NodeJS v4 or higher**
 
@@ -9,7 +9,7 @@ Usage
 ---
 
 ```
-const nDelta = require('node-delta');
+const fossilDelta = require('node-delta');
 ```
 
 Creating delta between `origin` and `target` buffer:
@@ -17,14 +17,14 @@ Creating delta between `origin` and `target` buffer:
 ```
 var origin = new Buffer([1,2,3,4]);
 var target = new Buffer([1,2,3,4,5,6]);
-var delta = nDelta.create(origin, target);
+var delta = fossilDelta.create(origin, target);
 ```
 
 Applying the delta:
 
 ```
 var origin = new Buffer([1,2,3,4]);
-var target = nDelta.apply(origin, delta);
+var target = fossilDelta.apply(origin, delta);
 ```
 
 Benchmarks
