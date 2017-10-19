@@ -1,4 +1,4 @@
-node-delta [![Build Status](https://secure.travis-ci.org/endel/node-delta.svg?branch=master)](http://travis-ci.org/endel/node-delta)
+node-delta [![Build Status](https://secure.travis-ci.org/endel/node-delta.svg?branch=master)](http://travis-ci.org/endel/node-delta) [![Build status](https://ci.appveyor.com/api/projects/status/m3shq2gxu1a1hk91?svg=true)](https://ci.appveyor.com/project/endel/node-delta)
 ===
 
 An efficient delta compression algorithm for Node.js. (C++ addon)
