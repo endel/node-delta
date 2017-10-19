@@ -24,21 +24,38 @@ var obj2 = {
   }
 }
 
-var packed1 = msgpack.encode(obj1);
-var packed2 = msgpack.encode(obj2);
+let packed1 = msgpack.encode(obj1);
+let packed2 = msgpack.encode(obj2);
+let patch = nodeDelta.create(packed1, packed2);
 
-let suite = new Benchmark.Suite()
+let createSuite = new Benchmark.Suite()
 
-suite.add('(create) node-delta', function() {
+createSuite.add('(create) node-delta', function() {
   nodeDelta.create(packed1, packed2);
 });
 
-suite.add('(create) fossil-delta', function() {
+createSuite.add('(create) fossil-delta', function() {
   fossilDelta.create(packed1, packed2);
 });
 
-suite.on('cycle', function(event) {
+createSuite.on('cycle', function(event) {
   console.log(String(event.target));
-})
+});
 
-suite.run();
+createSuite.run();
+
+let applySuite = new Benchmark.Suite()
+
+applySuite.add('(apply) node-delta', function() {
+  nodeDelta.apply(packed1, patch);
+});
+
+applySuite.add('(apply) fossil-delta', function() {
+  fossilDelta.apply(packed1, patch);
+});
+
+applySuite.on('cycle', function(event) {
+  console.log(String(event.target));
+});
+
+applySuite.run();

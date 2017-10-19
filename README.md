@@ -30,9 +30,18 @@ var target = fossilDelta.apply(origin, delta);
 Benchmarks
 ---
 
+For creating the patch, [node-delta](https://github.com/endel/node-delta/) has the best results. (roughly ~2x speed)
+
 ```
-(create) node-delta x 266,036 ops/sec ±3.01% (69 runs sampled)
-(create) fossil-delta x 199,668 ops/sec ±1.95% (82 runs sampled)
+(create) node-delta x 313,371 ops/sec ±1.76% (77 runs sampled)
+(create) fossil-delta x 238,424 ops/sec ±3.58% (75 runs sampled)
+```
+
+For applying the patch, [fossil-delta-js](https://github.com/dchest/fossil-delta-js) still have the best results.
+
+```
+(apply) node-delta x 664,472 ops/sec ±5.44% (69 runs sampled)
+(apply) fossil-delta x 860,541 ops/sec ±1.57% (84 runs sampled)
 ```
 
 References

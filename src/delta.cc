@@ -569,7 +569,7 @@ int delta_apply(
 ){
   unsigned int limit;
   unsigned int total = 0;
-#ifndef FOSSIL_OMIT_DELTA_CKSUM_TEST
+#ifdef FOSSIL_ENABLE_DELTA_CKSUM_TEST
   char *zOrigOut = zOut;
 #endif
 
@@ -626,7 +626,7 @@ int delta_apply(
       case ';': {
         zDelta++; lenDelta--;
         zOut[0] = 0;
-#ifndef FOSSIL_OMIT_DELTA_CKSUM_TEST
+#ifdef FOSSIL_ENABLE_DELTA_CKSUM_TEST
         if( cnt!=checksum(zOrigOut, total) ){
           /* ERROR:  bad checksum */
           return -1;
